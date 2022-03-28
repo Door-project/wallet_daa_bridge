@@ -1,4 +1,4 @@
-package eu.door.daa_bridge;
+package eu.door.daa_bridge.payload;
 
 import android.util.Base64;
 import java.util.Arrays;

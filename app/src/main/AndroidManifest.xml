@@ -18,8 +18,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".WalletDaaBridgeActivity"
+            android:name=".activity.WalletDaaBridgeActivity"
             android:exported="true">
+            <intent-filter>
+                <action android:name="eu.door.daa_bridge.REGISTER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="eu.door.daa_bridge.CHALLENGE_SOLUTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="eu.door.daa_bridge.SIGN" />
                 <category android:name="android.intent.category.DEFAULT" />
