@@ -1,10 +1,10 @@
 package eu.door.daa_bridge.payload;
 
-public class ChallengeSolutionResponse {
+public class VerifySignatureRequest {
     private String message;
     private byte[] signature;
 
-    public ChallengeSolutionResponse() {
+    public VerifySignatureRequest() {
     }
 
     public String getMessage() {

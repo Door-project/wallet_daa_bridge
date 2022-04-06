@@ -4,7 +4,7 @@ package eu.door.daa_bridge.action;
 // understand as a command
 public final class DaaBridgeActions {
     public static final String ACTION_REGISTER = "eu.door.daa_bridge.REGISTER";
-    public static final String ACTION_CHALLENGE_SOLUTION = "eu.door.daa_bridge.CHALLENGE_SOLUTION";
+    public static final String ACTION_VERIFY_SIGNATURE = "eu.door.daa_bridge.VERIFY_SIGNATURE";
     public static final String ACTION_SIGN = "eu.door.daa_bridge.SIGN";
     public static final String ACTION_ENABLE = "eu.door.daa_bridge.ENABLE";
     public static final String ACTION_ISSUE = "eu.door.daa_bridge.ISSUE";

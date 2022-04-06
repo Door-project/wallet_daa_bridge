@@ -14,17 +14,15 @@ import eu.door.daa_bridge.action.DaaBridgeActions;
 import eu.door.daa_bridge.R;
 import eu.door.daa_bridge.logic.RegistrationLogic;
 import eu.door.daa_bridge.model.ApplicationInfo;
-import eu.door.daa_bridge.model.SecurityChallenge;
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
-import eu.door.daa_bridge.payload.ChallengeSolutionRequest;
-import eu.door.daa_bridge.payload.ChallengeSolutionResponse;
 import eu.door.daa_bridge.payload.EnableRequest;
 import eu.door.daa_bridge.payload.IssueRequest;
 import eu.door.daa_bridge.payload.MockData;
+import eu.door.daa_bridge.payload.RegisterRequest;
+import eu.door.daa_bridge.payload.RegisterResponse;
+import eu.door.daa_bridge.payload.VerifySignatureRequest;
 
 public class WalletDaaBridgeActivity extends AppCompatActivity {
-
-    private static final String DEVICE_STATE_OK =  "_Device State OK_";
 
     WalletDaaBridgeData mData = WalletDaaBridgeData.getInstance();
 
@@ -45,11 +43,11 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         switch(action) {
             case DaaBridgeActions.ACTION_REGISTER:
                 Log.d("ACTION", "REGISTER");
-                register();
+                register(req);
                 break;
-            case DaaBridgeActions.ACTION_CHALLENGE_SOLUTION:
-                Log.d("ACTION", "CHALLENGE RESPONSE");
-                challengeSolution(req);
+            case DaaBridgeActions.ACTION_VERIFY_SIGNATURE:
+                Log.d("ACTION", "VERIFY SIGNATURE");
+                verifySignature(req);
                 break;
             case DaaBridgeActions.ACTION_SIGN:
                 Log.d("ACTION", "SIGN");
@@ -84,15 +82,19 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         return new ApplicationInfo(packageName, uid);
     }
 
-
-    private void register() {
+    private void register(String request) {
         ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
         mData.setCandidateApplicationInfo(callingApplicationInfo);
-        mData.setSecurityChallenge(new SecurityChallenge());
-        resultOk(mData.getSecurityChallenge().getChallenge());
+        Gson gson = new Gson();
+        RegisterRequest req = gson.fromJson(request, RegisterRequest.class);
+        Log.d("Reqister req", request);
+        RegistrationLogic logic = new RegistrationLogic();
+        logic.saveCertificate(req.getAlgorithm(), req.getCertificate());
+        RegisterResponse res = logic.createRegisterResponse(this, req);
+        resultOk(gson.toJson(res));
     }
 
-    private void challengeSolution(String request) {
+    private void verifySignature(String request) {
         ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
         Boolean isPairing = mData.isCandidate(callingApplicationInfo);
         if(!isPairing) {
@@ -101,28 +103,18 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         }
 
         Gson gson = new Gson();
-        ChallengeSolutionRequest req = gson.fromJson(request, ChallengeSolutionRequest.class);
-
+        VerifySignatureRequest req = gson.fromJson(request, VerifySignatureRequest.class);
+        Log.d("Verify req", request);
         RegistrationLogic logic = new RegistrationLogic();
-        Boolean verified = logic.verifyChallengeSolution(
-                this,
-                req.getSolution(),
-                mData.getSecurityChallenge().getSolution()
-        );
+
+        Boolean verified = logic.verify(this, req.getSignature(), req.getMessage());
 
         if(!verified){
             unauthorized();
         }
 
-        byte[] signature = logic.sign(this,  DEVICE_STATE_OK);
-        ChallengeSolutionResponse challengeSolutionRes = new ChallengeSolutionResponse();
-        challengeSolutionRes.setMessage(DEVICE_STATE_OK);
-        challengeSolutionRes.setSignature(signature);
-        String response = gson.toJson(challengeSolutionRes);
-        Log.d("ChallengeSolutionRes", response);
-
         mData.setPairingApplicationInfo(mData.getCandidateApplicationInfo());
-        resultOk(response);
+        resultOk("OK");
     }
 
     private void sign(String request) {

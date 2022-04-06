@@ -1,16 +1,18 @@
 package eu.door.daa_bridge.model;
 
+import java.security.cert.X509Certificate;
+
 public class WalletDaaBridgeData {
     private static WalletDaaBridgeData instance = null;
 
     private ApplicationInfo candidateApplicationInfo;
     private ApplicationInfo pairingApplicationInfo;
-    private SecurityChallenge securityChallenge;
+    private X509Certificate walletCertificate;
+    private String keyAlgorithm;
 
     private WalletDaaBridgeData() {
         candidateApplicationInfo = new ApplicationInfo("", -1);
         pairingApplicationInfo = new ApplicationInfo("", -1);
-        securityChallenge = null;
     }
 
     public static WalletDaaBridgeData getInstance()
@@ -37,14 +39,6 @@ public class WalletDaaBridgeData {
         this.pairingApplicationInfo = pairingApplicationInfo;
     }
 
-    public SecurityChallenge getSecurityChallenge() {
-        return securityChallenge;
-    }
-
-    public void setSecurityChallenge(SecurityChallenge challenge) {
-        this.securityChallenge = challenge;
-    }
-
     public Boolean isPairing(ApplicationInfo callingApplicationInfo) {
         return pairingApplicationInfo.getPackageName()
                 .equals(callingApplicationInfo
@@ -58,5 +52,22 @@ public class WalletDaaBridgeData {
                 .equals(callingApplicationInfo
                         .getPackageName()) &&
                 candidateApplicationInfo.getUid() == callingApplicationInfo.getUid();
+    }
+
+
+    public X509Certificate getWalletCertificate() {
+        return walletCertificate;
+    }
+
+    public void setWalletCertificate(X509Certificate walletCertificate) {
+        this.walletCertificate = walletCertificate;
+    }
+
+    public String getKeyAlgorithm() {
+        return keyAlgorithm;
+    }
+
+    public void setKeyAlgorithm(String keyAlgorithm) {
+        this.keyAlgorithm = keyAlgorithm;
     }
 }
