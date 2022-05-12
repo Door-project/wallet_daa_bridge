@@ -26,11 +26,6 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
             <intent-filter>
-                <action android:name="eu.door.daa_bridge.VERIFY_SIGNATURE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-            <intent-filter>
                 <action android:name="eu.door.daa_bridge.SIGN" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />

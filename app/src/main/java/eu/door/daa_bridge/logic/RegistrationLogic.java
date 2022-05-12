@@ -36,27 +36,27 @@ public class RegistrationLogic {
         return SecurityUtil.getPrivateKey(context,keystoreInfo);
     }
 
-    public Boolean verify(Context context, byte[] signature, String message) {
-        PublicKey publicKey = data.getWalletCertificate().getPublicKey();
-        Boolean verified = false;
-        try {
-            verified = SecurityUtil.verifySignature(
-                    data.getKeyAlgorithm(),
-                    publicKey,
-                    message.getBytes(StandardCharsets.UTF_8),
-                    signature
-            );
-        } catch (Exception e) {
-            Log.d("verifySignature", "Failed to verify signature: "+e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
+//    public Boolean verify(Context context, byte[] signature, byte[] message) {
+//        PublicKey publicKey = data.getWalletPublicKey();
+//        Boolean verified = false;
+//        try {
+//            verified = SecurityUtil.verifySignature(
+//                    data.getKeyAlgorithm(),
+//                    publicKey,
+//                    message,
+//                    signature
+//            );
+//        } catch (Exception e) {
+//            Log.d("verifySignature", "Failed to verify signature: "+e.getMessage());
+//            e.printStackTrace();
+//            return false;
+//        }
+//
+//        return verified;
+//    }
 
-        return verified;
-    }
 
-
-    public byte[] sign(Context context, String message) {
+    public byte[] sign(Context context, byte[] message) {
         PrivateKey pk = getPrivateKey(context);
 
         byte[] signature = new byte[0];
@@ -74,14 +74,8 @@ public class RegistrationLogic {
         PrivateKey pk = getPrivateKey(context);
 
         RegisterResponse res = new RegisterResponse();
-        res.setNonse1(req.getNonce1());
-        Random r = new Random();
-        int n = r.nextInt();
-        String nonse2 = Integer.toString(n);
-        res.setNonse2(nonse2);
         try {
-            res.setSigned1( SecurityUtil.sign(data.getKeyAlgorithm(), pk, req.getNonce1()) );
-            res.setSigned2( SecurityUtil.sign(data.getKeyAlgorithm(), pk, nonse2));
+            res.setSigned( SecurityUtil.sign(data.getKeyAlgorithm(), pk, req.getNonce()) );
         } catch (Exception e) {
             Log.e("signature", "Failed to sign message");
             e.printStackTrace();
@@ -89,15 +83,8 @@ public class RegistrationLogic {
         return res;
     }
 
-    public void saveCertificate(String algorithm, byte[] certificate) {
-        try {
-            CertificateFactory fact = CertificateFactory.getInstance("X.509");
-            X509Certificate walletCertificate = (X509Certificate) fact.generateCertificate(new ByteArrayInputStream(certificate));
-            data.setWalletCertificate(walletCertificate);
-            data.setKeyAlgorithm(algorithm);
-        } catch (CertificateException e) {
-            Log.e("saveCertificate", e.getMessage());
-            e.printStackTrace();
-        }
+    public void saveCertificate(String algorithm, String publicKey) {
+        data.setWalletCertificate(publicKey);
+        data.setKeyAlgorithm(algorithm);
     }
 }

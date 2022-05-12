@@ -1,19 +1,19 @@
 package eu.door.daa_bridge.payload;
 
 public class RegisterRequest {
-    private byte[] certificate;
+    private String publicKey;
     private String algorithm;
-    private String nonce1;
+    private byte[] nonce;
 
     public RegisterRequest() {
     }
 
-    public byte[] getCertificate() {
-        return certificate;
+    public String getPublicKey() {
+        return publicKey;
     }
 
-    public void setCertificate(byte[] certificate) {
-        this.certificate = certificate;
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 
     public String getAlgorithm() {
@@ -24,11 +24,11 @@ public class RegisterRequest {
         this.algorithm = algorithm;
     }
 
-    public String getNonce1() {
-        return nonce1;
+    public byte[] getNonce() {
+        return nonce;
     }
 
-    public void setNonce1(String nonce1) {
-        this.nonce1 = nonce1;
+    public void setNonce(byte[] nonce) {
+        this.nonce = nonce;
     }
 }

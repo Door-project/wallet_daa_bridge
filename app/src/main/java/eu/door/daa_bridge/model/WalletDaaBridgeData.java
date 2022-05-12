@@ -1,13 +1,11 @@
 package eu.door.daa_bridge.model;
 
-import java.security.cert.X509Certificate;
-
 public class WalletDaaBridgeData {
     private static WalletDaaBridgeData instance = null;
 
     private ApplicationInfo candidateApplicationInfo;
     private ApplicationInfo pairingApplicationInfo;
-    private X509Certificate walletCertificate;
+    private String walletCertificate;
     private String keyAlgorithm;
 
     private WalletDaaBridgeData() {
@@ -55,11 +53,11 @@ public class WalletDaaBridgeData {
     }
 
 
-    public X509Certificate getWalletCertificate() {
+    public String getWalletCertificate() {
         return walletCertificate;
     }
 
-    public void setWalletCertificate(X509Certificate walletCertificate) {
+    public void setWalletCertificate(String walletCertificate) {
         this.walletCertificate = walletCertificate;
     }
 

@@ -24,6 +24,8 @@ import eu.door.daa_bridge.payload.VerifySignatureRequest;
 
 public class WalletDaaBridgeActivity extends AppCompatActivity {
 
+    private static RegistrationLogic logic = new RegistrationLogic();
+
     WalletDaaBridgeData mData = WalletDaaBridgeData.getInstance();
 
     @Override
@@ -44,10 +46,6 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
             case DaaBridgeActions.ACTION_REGISTER:
                 Log.d("ACTION", "REGISTER");
                 register(req);
-                break;
-            case DaaBridgeActions.ACTION_VERIFY_SIGNATURE:
-                Log.d("ACTION", "VERIFY SIGNATURE");
-                verifySignature(req);
                 break;
             case DaaBridgeActions.ACTION_SIGN:
                 Log.d("ACTION", "SIGN");
@@ -83,39 +81,18 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
     }
 
     private void register(String request) {
+        //TODO: change it
         ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
         mData.setCandidateApplicationInfo(callingApplicationInfo);
+
         Gson gson = new Gson();
         RegisterRequest req = gson.fromJson(request, RegisterRequest.class);
         Log.d("Reqister req", request);
-        RegistrationLogic logic = new RegistrationLogic();
-        logic.saveCertificate(req.getAlgorithm(), req.getCertificate());
+        logic.saveCertificate(req.getAlgorithm(), req.getPublicKey());
         RegisterResponse res = logic.createRegisterResponse(this, req);
         resultOk(gson.toJson(res));
     }
 
-    private void verifySignature(String request) {
-        ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
-        Boolean isPairing = mData.isCandidate(callingApplicationInfo);
-        if(!isPairing) {
-            unauthorized();
-            return;
-        }
-
-        Gson gson = new Gson();
-        VerifySignatureRequest req = gson.fromJson(request, VerifySignatureRequest.class);
-        Log.d("Verify req", request);
-        RegistrationLogic logic = new RegistrationLogic();
-
-        Boolean verified = logic.verify(this, req.getSignature(), req.getMessage());
-
-        if(!verified){
-            unauthorized();
-        }
-
-        mData.setPairingApplicationInfo(mData.getCandidateApplicationInfo());
-        resultOk("OK");
-    }
 
     private void sign(String request) {
         ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();

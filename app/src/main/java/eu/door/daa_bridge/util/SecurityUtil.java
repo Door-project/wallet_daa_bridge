@@ -41,10 +41,10 @@ public class SecurityUtil {
         }
     }
 
-    public static byte[] sign(String keyAlg, PrivateKey privateKey, String message) throws Exception {
+    public static byte[] sign(String keyAlg, PrivateKey privateKey, byte[] message) throws Exception {
         Signature privateSignature = Signature.getInstance(getCompatibleSigAlgName(keyAlg));
         privateSignature.initSign(privateKey);
-        privateSignature.update(message.getBytes(UTF_8));
+        privateSignature.update(message);
         byte[] signature = privateSignature.sign();
         return signature;
     }
