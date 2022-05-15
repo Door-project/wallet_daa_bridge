@@ -9,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.door.daa_bridge.action.DaaBridgeActions;
 import eu.door.daa_bridge.R;
 import eu.door.daa_bridge.logic.IssueLogic;
@@ -18,11 +21,15 @@ import eu.door.daa_bridge.model.ApplicationInfo;
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
 import eu.door.daa_bridge.payload.EnableRequest;
 import eu.door.daa_bridge.payload.EnableResponse;
+import eu.door.daa_bridge.payload.Evidence;
+import eu.door.daa_bridge.payload.IssueObject;
 import eu.door.daa_bridge.payload.IssueResponse;
 import eu.door.daa_bridge.payload.RegisterRequest;
 import eu.door.daa_bridge.payload.RegisterResponse;
+import eu.door.daa_bridge.payload.RegnObject;
 import eu.door.daa_bridge.payload.SignVcRequest;
 import eu.door.daa_bridge.payload.SignVcResponse;
+import eu.door.daa_bridge.payload.SignVpErrorResponse;
 import eu.door.daa_bridge.payload.SignVpReqResponse;
 import eu.door.daa_bridge.payload.SignVpRequest;
 import eu.door.daa_bridge.payload.SignVpResponse;
@@ -124,10 +131,9 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
         mData.setPairingApplicationInfo(callingApplicationInfo);
 
-        //set wallet public key to TPM
-        //Boolean isOk = tmp.setWalletPublicKey()
+        byte[] signature = registrationLogic.signNonce(this, req.getNonce());
 
-        RegisterResponse res = registrationLogic.signNonce(this, req.getNonce());
+        RegisterResponse res = registrationLogic.createRegisterResponse(signature);
         resultOk(gson.toJson(res));
     }
 
@@ -157,10 +163,9 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
             return;
         }
 
-        //enable and get RegnObject from TPM
-        //RegnObject regnObject = tpm.enable();
+        RegnObject regnObject = registrationLogic.enable();
 
-        EnableResponse res = registrationLogic.createEnableResponse(/*regnObject*/);
+        EnableResponse res = registrationLogic.createEnableResponse(regnObject);
         resultOk(gson.toJson(res));
     }
 
@@ -180,10 +185,9 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
             return;
         }
 
-        //issue and get TPM Nonce
-        //byte[] tpmNonce = tpm.issue();
+        byte[] tpmNonce = issueLogic.getTpmNonce();
 
-        IssueResponse res = issueLogic.createIssueResponse(/*tpmNonce*/);
+        IssueResponse res = issueLogic.createIssueResponse(tpmNonce);
         Gson gson = new Gson();
         resultOk(gson.toJson(res));
     }
@@ -214,10 +218,9 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
             return;
         }
 
-        //get issue object
-        //IssueObject issueObject = tpm.getIssueObject();
+        IssueObject issueObject = issueLogic.getIssueObject();
 
-        SignVcResponse res = issueLogic.createSignVcResponse(/*issueObject*/);
+        SignVcResponse res = issueLogic.createSignVcResponse(issueObject);
         resultOk(gson.toJson(res));
     }
 
@@ -238,10 +241,9 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
             return;
         }
 
-        //get TPM Nonce
-        //byte[] tpmNonce = tpm.getTpmNonce();
+        byte[] tpmNonce = signLogic.getTpmNonce();
 
-        SignVpReqResponse res = signLogic.createSignVpReqResponse(/*tpmNonce*/);
+        SignVpReqResponse res = signLogic.createSignVpReqResponse(tpmNonce);
         Gson gson = new Gson();
         resultOk(gson.toJson(res));
     }
@@ -251,7 +253,7 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
      * Executing the DAA_SIGN_VP phase
      * - Receive SignVpRequest with signed<TPM Nonce> and RPNonce from the wallet
      * - Verify calling application and signature
-     * - Sign RpNonce and get SignVpObj
+     * - Verify evidence objects and sign RpNonce
      *
      * @Returns SignVpResponse with Signed(RPNonce) or
      * Error(RegnObject,{set of Credential-ids})
@@ -274,10 +276,21 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
             return;
         }
 
-        // verify and sign RpNonce
-        // SignVpObj signVpObj = tpm.getSignVpObject()
+        List<Evidence> unverified = new ArrayList<>();
+        isVerified = signLogic.verifyEvidenceObjects(req.getEvidenceObjects(), unverified);
 
-        SignVpResponse res = signLogic.createSignVpResponse(/*signVpObj*/);
+        if(!isVerified) {
+
+            RegnObject regnObject = signLogic.enable();
+
+            SignVpErrorResponse res = signLogic.createSignVpErrorResponse(regnObject, unverified);
+            error(gson.toJson(res));
+            return;
+        }
+
+        byte[] signedRpNonce = signLogic.sign(req.getRPNonce());
+
+        SignVpResponse res = signLogic.createSignVpResponse(signedRpNonce);
         resultOk(gson.toJson(res));
     }
 
@@ -288,6 +301,15 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         setResult(DaaBridgeActions.RESULT_OK, result);
         finish();
     }
+
+    private void error(String response) {
+        Intent result = new Intent();
+        result.putExtra(DaaBridgeActions.EXTRA_STRING_RES, response);
+        setResult(DaaBridgeActions.RESULT_NO_VALID_AIC, result);
+        finish();
+    }
+
+
 
     private void badRequest() {
         Intent result = new Intent();

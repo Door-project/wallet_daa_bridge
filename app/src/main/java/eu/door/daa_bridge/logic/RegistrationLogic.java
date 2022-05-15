@@ -5,13 +5,13 @@ import android.util.Log;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.time.Instant;
 import java.util.Arrays;
 
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
 import eu.door.daa_bridge.payload.EnableRequest;
 import eu.door.daa_bridge.payload.EnableResponse;
 import eu.door.daa_bridge.payload.RegisterResponse;
+import eu.door.daa_bridge.payload.RegnObject;
 import eu.door.daa_bridge.util.KeystoreInfo;
 import eu.door.daa_bridge.util.SecurityUtil;
 
@@ -33,7 +33,12 @@ public class RegistrationLogic {
         return SecurityUtil.getPrivateKey(context,keystoreInfo);
     }
 
+
     public Boolean saveCertificate(String algorithm, String publicKey) {
+        //integration with TPM Library
+        //set wallet public key to TPM
+        //Boolean isOk = tmp.setWalletPublicKey(algorithm, publicKey);
+
         PublicKey pk = SecurityUtil.readPublicKey(publicKey);
         if(pk == null){
             return false;
@@ -43,7 +48,7 @@ public class RegistrationLogic {
         return true;
     }
 
-    public RegisterResponse signNonce(Context context, byte[] nonce) {
+    public byte[] signNonce(Context context, byte[] nonce) {
         PrivateKey pk = getPrivateKey(context);
 
         byte[] signature = new byte[0];
@@ -54,9 +59,7 @@ public class RegistrationLogic {
             Log.e("signature", "Failed to sign message");
             e.printStackTrace();
         }
-        RegisterResponse res = new RegisterResponse();
-        res.setSigned(signature);
-        return res;
+        return signature;
     }
 
     public Boolean verify(EnableRequest req) {
@@ -80,8 +83,21 @@ public class RegistrationLogic {
     }
 
     //integration with TPM library
-    public EnableResponse createEnableResponse() {
-        return null;
+    public RegnObject enable() {
+        return new RegnObject();
     }
 
+    public RegisterResponse createRegisterResponse(byte[] signature) {
+        RegisterResponse res = new RegisterResponse();
+        res.setSigned(signature);
+        return res;
+    }
+
+    //integration with TPM library
+    public EnableResponse createEnableResponse(RegnObject regnObject) {
+        EnableResponse res = new EnableResponse();
+        res.setP_EK(regnObject.getP_EK());
+        res.setTpmNonce(regnObject.getTpmNonce());
+        return res;
+    }
 }
