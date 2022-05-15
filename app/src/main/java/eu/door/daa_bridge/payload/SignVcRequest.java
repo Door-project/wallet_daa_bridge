@@ -1,18 +1,18 @@
 package eu.door.daa_bridge.payload;
 
-public class EnableRequest {
-    private byte[] time;
+public class SignVcRequest {
+    private byte[] nonce;
     private byte[] signed;
 
-    public EnableRequest() {
+    public SignVcRequest() {
     }
 
-    public byte[] getTime() {
-        return time;
+    public byte[] getNonce() {
+        return nonce;
     }
 
-    public void setTime(byte[] time) {
-        this.time = time;
+    public void setNonce(byte[] nonce) {
+        this.nonce = nonce;
     }
 
     public byte[] getSigned() {

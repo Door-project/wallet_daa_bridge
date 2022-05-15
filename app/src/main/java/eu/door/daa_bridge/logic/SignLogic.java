@@ -5,23 +5,22 @@ import android.util.Log;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.time.Instant;
 import java.util.Arrays;
 
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
-import eu.door.daa_bridge.payload.EnableRequest;
-import eu.door.daa_bridge.payload.EnableResponse;
 import eu.door.daa_bridge.payload.RegisterResponse;
+import eu.door.daa_bridge.payload.SignVpReqResponse;
+import eu.door.daa_bridge.payload.SignVpRequest;
+import eu.door.daa_bridge.payload.SignVpResponse;
 import eu.door.daa_bridge.util.KeystoreInfo;
 import eu.door.daa_bridge.util.SecurityUtil;
 
-public class RegistrationLogic {
+public class SignLogic {
+    private final WalletDaaBridgeData data = WalletDaaBridgeData.getInstance();
 
     private static final String KEYSTORE_ALIAS = "daabridge";
     private static final String KEYSTORE_PASSWORD = "p@ssw0rd!";
     private static final String KEYSTORE_FILENAME = "daabridge.keystore";
-
-    private final WalletDaaBridgeData data = WalletDaaBridgeData.getInstance();
 
     private PrivateKey getPrivateKey(Context context){
         KeystoreInfo keystoreInfo = new KeystoreInfo(
@@ -33,41 +32,14 @@ public class RegistrationLogic {
         return SecurityUtil.getPrivateKey(context,keystoreInfo);
     }
 
-    public Boolean saveCertificate(String algorithm, String publicKey) {
-        PublicKey pk = SecurityUtil.readPublicKey(publicKey);
-        if(pk == null){
-            return false;
-        }
-        data.setWalletPublicKey(SecurityUtil.readPublicKey(publicKey));
-        data.setKeyAlgorithm(algorithm);
-        return true;
-    }
-
-    public RegisterResponse signNonce(Context context, byte[] nonce) {
-        PrivateKey pk = getPrivateKey(context);
-
-        byte[] signature = new byte[0];
-        try {
-            signature = SecurityUtil.sign(data.getKeyAlgorithm(), pk, nonce);
-            Log.d("signature", Arrays.toString(signature));
-        } catch (Exception e) {
-            Log.e("signature", "Failed to sign message");
-            e.printStackTrace();
-        }
-        RegisterResponse res = new RegisterResponse();
-        res.setSigned(signature);
-        return res;
-    }
-
-    public Boolean verify(EnableRequest req) {
-
+    public Boolean verify(SignVpRequest req) {
         PublicKey publicKey = data.getWalletPublicKey();
         Boolean verified = false;
         try {
             verified = SecurityUtil.verifySignature(
                     data.getKeyAlgorithm(),
                     publicKey,
-                    req.getTime(),
+                    req.getNonce(),
                     req.getSigned()
             );
         } catch (Exception e) {
@@ -79,9 +51,13 @@ public class RegistrationLogic {
         return verified;
     }
 
+    public SignVpResponse createSignVpResponse() {
+        return new SignVpResponse();
+    }
+
     //integration with TPM library
-    public EnableResponse createEnableResponse() {
-        return null;
+    public SignVpReqResponse createSignVpReqResponse() {
+        return new SignVpReqResponse();
     }
 
 }

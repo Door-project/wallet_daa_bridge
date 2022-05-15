@@ -7,12 +7,15 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
@@ -20,6 +23,12 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+
+
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 
 
 public class SecurityUtil {
@@ -89,6 +98,25 @@ public class SecurityUtil {
         }
         return publicKey;
     }
+
+
+    public static PublicKey readPublicKey(String sPemPublicKey) {
+        Security.removeProvider("BC");
+        Security.addProvider(new BouncyCastleProvider());
+
+        Reader reader = new StringReader(sPemPublicKey);
+        PEMParser pemParser = new PEMParser(reader);
+        try {
+            SubjectPublicKeyInfo parsedPk = (SubjectPublicKeyInfo) pemParser.readObject();
+            PublicKey publicKey = new JcaPEMKeyConverter().getPublicKey(parsedPk);
+            return publicKey;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 
 }

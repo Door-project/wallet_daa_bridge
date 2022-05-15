@@ -4,9 +4,11 @@ package eu.door.daa_bridge.action;
 // understand as a command
 public final class DaaBridgeActions {
     public static final String ACTION_REGISTER = "eu.door.daa_bridge.REGISTER";
-    public static final String ACTION_SIGN = "eu.door.daa_bridge.SIGN";
     public static final String ACTION_ENABLE = "eu.door.daa_bridge.ENABLE";
     public static final String ACTION_ISSUE = "eu.door.daa_bridge.ISSUE";
+    public static final String ACTION_SIGN_VC = "eu.door.daa_bridge.SIGN_VC";
+    public static final String ACTION_SIGN_VP_REQ = "eu.door.daa_bridge.SIGN_VP_REQ";
+    public static final String ACTION_SIGN_VP = "eu.door.daa_bridge.SIGN_VP";
 
     public static final String EXTRA_STRING_REQ = "eu.door.daa_bridge.REQUEST";
     public static final String EXTRA_STRING_RES = "eu.door.daa_bridge.RESPONSE";

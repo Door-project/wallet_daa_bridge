@@ -1,18 +1,9 @@
 package eu.door.daa_bridge.payload;
 
-public class EnableResponse {
-    private byte[] P_EK;
+public class SignVpReqResponse {
     private byte[] tpmNonce;
 
-    public EnableResponse() {
-    }
-
-    public byte[] getP_EK() {
-        return P_EK;
-    }
-
-    public void setP_EK(byte[] p_EK) {
-        P_EK = p_EK;
+    public SignVpReqResponse() {
     }
 
     public byte[] getTpmNonce() {

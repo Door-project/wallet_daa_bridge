@@ -1,15 +1,15 @@
 package eu.door.daa_bridge.model;
 
+import java.security.PublicKey;
+
 public class WalletDaaBridgeData {
     private static WalletDaaBridgeData instance = null;
 
-    private ApplicationInfo candidateApplicationInfo;
     private ApplicationInfo pairingApplicationInfo;
-    private String walletCertificate;
+    private PublicKey walletPublicKey;
     private String keyAlgorithm;
 
     private WalletDaaBridgeData() {
-        candidateApplicationInfo = new ApplicationInfo("", -1);
         pairingApplicationInfo = new ApplicationInfo("", -1);
     }
 
@@ -19,14 +19,6 @@ public class WalletDaaBridgeData {
             instance = new WalletDaaBridgeData();
 
         return instance;
-    }
-
-    public ApplicationInfo getCandidateApplicationInfo() {
-        return candidateApplicationInfo;
-    }
-
-    public void setCandidateApplicationInfo(ApplicationInfo candidateApplicationInfo) {
-        this.candidateApplicationInfo = candidateApplicationInfo;
     }
 
     public ApplicationInfo getPairingApplicationInfo() {
@@ -45,20 +37,12 @@ public class WalletDaaBridgeData {
 
     }
 
-    public Boolean isCandidate(ApplicationInfo callingApplicationInfo) {
-        return candidateApplicationInfo.getPackageName()
-                .equals(callingApplicationInfo
-                        .getPackageName()) &&
-                candidateApplicationInfo.getUid() == callingApplicationInfo.getUid();
+    public PublicKey getWalletPublicKey() {
+        return walletPublicKey;
     }
 
-
-    public String getWalletCertificate() {
-        return walletCertificate;
-    }
-
-    public void setWalletCertificate(String walletCertificate) {
-        this.walletCertificate = walletCertificate;
+    public void setWalletPublicKey(PublicKey walletPublicKey) {
+        this.walletPublicKey = walletPublicKey;
     }
 
     public String getKeyAlgorithm() {
