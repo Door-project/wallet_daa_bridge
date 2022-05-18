@@ -3,14 +3,14 @@ package eu.door.daa_bridge.payload;
 
 import java.util.List;
 
-public class SignVpRequest {
+public class SignRequest {
     private byte[] nonce;
     private byte[] signed;
     private byte[] RPNonce;
     private String credentialId;
     private List<Evidence> evidenceObjects;
 
-    public SignVpRequest() {
+    public SignRequest() {
     }
 
     public byte[] getNonce() {

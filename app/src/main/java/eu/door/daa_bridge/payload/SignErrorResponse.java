@@ -2,11 +2,11 @@ package eu.door.daa_bridge.payload;
 
 import java.util.List;
 
-public class SignVpErrorResponse {
+public class SignErrorResponse {
     private List<Evidence> evidenceObjects;
     private RegnObject regnObject;
 
-    public SignVpErrorResponse() {
+    public SignErrorResponse() {
     }
 
     public List<Evidence> getEvidenceObjects() {

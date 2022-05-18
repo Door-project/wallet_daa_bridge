@@ -1,16 +1,43 @@
 package eu.door.daa_bridge.payload;
 
 public class IssueResponse {
-    private byte[] tpmNonce;
+    private byte[] daaCRD;
+    private byte[] nonce;
+    private byte[] signature;
+    private String id;
 
     public IssueResponse() {
     }
 
-    public byte[] getTpmNonce() {
-        return tpmNonce;
+    public byte[] getDaaCRD() {
+        return daaCRD;
     }
 
-    public void setTpmNonce(byte[] tpmNonce) {
-        this.tpmNonce = tpmNonce;
+    public void setDaaCRD(byte[] daaCRD) {
+        this.daaCRD = daaCRD;
+    }
+
+    public byte[] getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(byte[] nonce) {
+        this.nonce = nonce;
+    }
+
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -24,15 +24,14 @@ import eu.door.daa_bridge.payload.EnableResponse;
 import eu.door.daa_bridge.payload.Evidence;
 import eu.door.daa_bridge.payload.IssueObject;
 import eu.door.daa_bridge.payload.IssueResponse;
+import eu.door.daa_bridge.payload.NonceResponse;
 import eu.door.daa_bridge.payload.RegisterRequest;
 import eu.door.daa_bridge.payload.RegisterResponse;
 import eu.door.daa_bridge.payload.RegnObject;
-import eu.door.daa_bridge.payload.SignVcRequest;
-import eu.door.daa_bridge.payload.SignVcResponse;
-import eu.door.daa_bridge.payload.SignVpErrorResponse;
-import eu.door.daa_bridge.payload.SignVpReqResponse;
-import eu.door.daa_bridge.payload.SignVpRequest;
-import eu.door.daa_bridge.payload.SignVpResponse;
+import eu.door.daa_bridge.payload.SignRequest;
+import eu.door.daa_bridge.payload.IssueRequest;
+import eu.door.daa_bridge.payload.SignErrorResponse;
+import eu.door.daa_bridge.payload.SignResponse;
 
 public class WalletDaaBridgeActivity extends AppCompatActivity {
 
@@ -65,21 +64,17 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
                 Log.d("ACTION", "ENABLE");
                 enable(req);
                 break;
+            case DaaBridgeActions.ACTION_NONCE:
+                Log.d("ACTION", "NONCE");
+                nonce();
+                break;
             case DaaBridgeActions.ACTION_ISSUE:
                 Log.d("ACTION", "ISSUE");
-                issue();
+                issue(req);
                 break;
-            case DaaBridgeActions.ACTION_SIGN_VC:
-                Log.d("ACTION", "SIGN_VC");
-                signVC(req);
-                break;
-            case DaaBridgeActions.ACTION_SIGN_VP_REQ:
-                Log.d("ACTION", "SIGN_VP_REQ");
-                signVPReq();
-                break;
-            case DaaBridgeActions.ACTION_SIGN_VP:
-                Log.d("ACTION", "SIGN_VP");
-                signVP(req);
+            case DaaBridgeActions.ACTION_SIGN:
+                Log.d("ACTION", "SIGN");
+                sign(req);
                 break;
             default:
                 Log.d("ACTION", action);
@@ -169,15 +164,16 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         resultOk(gson.toJson(res));
     }
 
+
     /**
-     * Executing the DAA_ISSUE phase
+     * Executing the DAA_NONCE phase
      * - Verify calling application
      * - Get TPM nonce
      *
-     * @Returns IssueResponse with tpmNonce or unauthorized
+     * @Returns NonceResponse with tpmNonce or unauthorized
      * if calling application not verified
      */
-    private void issue() {
+    private void nonce() {
         ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
         Boolean isPairing = mData.isPairing(callingApplicationInfo);
         if(!isPairing) {
@@ -187,21 +183,21 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
 
         byte[] tpmNonce = issueLogic.getTpmNonce();
 
-        IssueResponse res = issueLogic.createIssueResponse(tpmNonce);
+        NonceResponse res = issueLogic.createNonceResponse(tpmNonce);
         Gson gson = new Gson();
         resultOk(gson.toJson(res));
     }
 
     /**
-     * Executing the DAA_SIGN_VC phase
+     * Executing the DAA_ISSUE phase
      * - Receive signed<TPMNonce>
      * - Verify calling application and signature
      * - Get issue Object
      *
-     * @Returns SignVcResponse with issueObject or unauthorized
+     * @Returns IssueResponse with issueObject or unauthorized
      * if signature or calling application not verified
      */
-    private void signVC(String request) {
+    private void issue(String request) {
         ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
         Boolean isPairing = mData.isPairing(callingApplicationInfo);
         if(!isPairing) {
@@ -210,7 +206,7 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         }
 
         Gson gson = new Gson();
-        SignVcRequest req = gson.fromJson(request, SignVcRequest.class);
+        IssueRequest req = gson.fromJson(request, IssueRequest.class);
 
         Boolean isVerified = issueLogic.verify(req);
         if(!isVerified) {
@@ -220,46 +216,21 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
 
         IssueObject issueObject = issueLogic.getIssueObject();
 
-        SignVcResponse res = issueLogic.createSignVcResponse(issueObject);
+        IssueResponse res = issueLogic.createIssueResponse(issueObject);
         resultOk(gson.toJson(res));
     }
 
-
     /**
-     * Executing the DAA_SIGN_VP_REQ phase
-     * - Verify calling application
-     * - Get TPM nonce
-     *
-     * @Returns SignVpReqResponse with tpmNonce or unauthorized
-     * if calling application not verified
-     */
-    private void signVPReq() {
-        ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
-        Boolean isPairing = mData.isPairing(callingApplicationInfo);
-        if(!isPairing) {
-            unauthorized();
-            return;
-        }
-
-        byte[] tpmNonce = signLogic.getTpmNonce();
-
-        SignVpReqResponse res = signLogic.createSignVpReqResponse(tpmNonce);
-        Gson gson = new Gson();
-        resultOk(gson.toJson(res));
-    }
-
-
-    /**
-     * Executing the DAA_SIGN_VP phase
+     * Executing the DAA_SIGN phase
      * - Receive SignVpRequest with signed<TPM Nonce> and RPNonce from the wallet
      * - Verify calling application and signature
      * - Verify evidence objects and sign RpNonce
      *
-     * @Returns SignVpResponse with Signed(RPNonce) or
+     * @Returns SignResponse with Signed(RPNonce) or
      * Error(RegnObject,{set of Credential-ids})
      * unauthorized if signature or calling application not verified or
      */
-    private void signVP(String request) {
+    private void sign(String request) {
         ApplicationInfo callingApplicationInfo = getCallingApplicationInfo();
         Boolean isPairing = mData.isPairing(callingApplicationInfo);
         if(!isPairing) {
@@ -268,7 +239,7 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         }
 
         Gson gson = new Gson();
-        SignVpRequest req = gson.fromJson(request, SignVpRequest.class);
+        SignRequest req = gson.fromJson(request, SignRequest.class);
 
         Boolean isVerified = signLogic.verify(req);
         if(!isVerified) {
@@ -283,14 +254,14 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
 
             RegnObject regnObject = signLogic.enable();
 
-            SignVpErrorResponse res = signLogic.createSignVpErrorResponse(regnObject, unverified);
+            SignErrorResponse res = signLogic.createSignVpErrorResponse(regnObject, unverified);
             error(gson.toJson(res));
             return;
         }
 
         byte[] signedRpNonce = signLogic.sign(req.getRPNonce());
 
-        SignVpResponse res = signLogic.createSignVpResponse(signedRpNonce);
+        SignResponse res = signLogic.createSignResponse(signedRpNonce);
         resultOk(gson.toJson(res));
     }
 

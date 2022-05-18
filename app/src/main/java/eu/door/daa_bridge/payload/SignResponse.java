@@ -1,9 +1,9 @@
 package eu.door.daa_bridge.payload;
 
-public class SignVpResponse {
+public class SignResponse {
     private byte[] signedRpNonce;
 
-    public SignVpResponse() {
+    public SignResponse() {
     }
 
     public byte[] getSignedRpNonce() {

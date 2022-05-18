@@ -1,10 +1,10 @@
 package eu.door.daa_bridge.payload;
 
-public class SignVcRequest {
+public class IssueRequest {
     private byte[] nonce;
     private byte[] signed;
 
-    public SignVcRequest() {
+    public IssueRequest() {
     }
 
     public byte[] getNonce() {

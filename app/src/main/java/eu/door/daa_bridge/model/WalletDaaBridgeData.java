@@ -8,6 +8,7 @@ public class WalletDaaBridgeData {
     private ApplicationInfo pairingApplicationInfo;
     private PublicKey walletPublicKey;
     private String keyAlgorithm;
+    private String token;
 
     private WalletDaaBridgeData() {
         pairingApplicationInfo = new ApplicationInfo("", -1);
@@ -51,5 +52,13 @@ public class WalletDaaBridgeData {
 
     public void setKeyAlgorithm(String keyAlgorithm) {
         this.keyAlgorithm = keyAlgorithm;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

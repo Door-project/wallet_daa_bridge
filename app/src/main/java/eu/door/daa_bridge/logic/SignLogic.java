@@ -5,17 +5,14 @@ import android.util.Log;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.Arrays;
 import java.util.List;
 
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
 import eu.door.daa_bridge.payload.Evidence;
-import eu.door.daa_bridge.payload.RegisterResponse;
 import eu.door.daa_bridge.payload.RegnObject;
-import eu.door.daa_bridge.payload.SignVpErrorResponse;
-import eu.door.daa_bridge.payload.SignVpReqResponse;
-import eu.door.daa_bridge.payload.SignVpRequest;
-import eu.door.daa_bridge.payload.SignVpResponse;
+import eu.door.daa_bridge.payload.SignErrorResponse;
+import eu.door.daa_bridge.payload.SignRequest;
+import eu.door.daa_bridge.payload.SignResponse;
 import eu.door.daa_bridge.util.KeystoreInfo;
 import eu.door.daa_bridge.util.SecurityUtil;
 
@@ -37,7 +34,7 @@ public class SignLogic {
     }
 
     //integration with TPM library
-    public Boolean verify(SignVpRequest req) {
+    public Boolean verify(SignRequest req) {
         PublicKey publicKey = data.getWalletPublicKey();
         Boolean verified = false;
         try {
@@ -56,16 +53,9 @@ public class SignLogic {
         return verified;
     }
 
-    public SignVpResponse createSignVpResponse(byte[] signedRpNonce) {
-        SignVpResponse res = new SignVpResponse();
+    public SignResponse createSignResponse(byte[] signedRpNonce) {
+        SignResponse res = new SignResponse();
         res.setSignedRpNonce(signedRpNonce);
-        return res;
-    }
-
-    //integration with TPM library
-    public SignVpReqResponse createSignVpReqResponse(byte[] tpmNonce) {
-        SignVpReqResponse res = new SignVpReqResponse();
-        res.setTpmNonce(tpmNonce);
         return res;
     }
 
@@ -92,8 +82,8 @@ public class SignLogic {
         return new RegnObject();
     }
 
-    public SignVpErrorResponse createSignVpErrorResponse(RegnObject regnObject, List<Evidence> unverified) {
-        SignVpErrorResponse res = new SignVpErrorResponse();
+    public SignErrorResponse createSignVpErrorResponse(RegnObject regnObject, List<Evidence> unverified) {
+        SignErrorResponse res = new SignErrorResponse();
         res.setRegnObject(regnObject);
         res.setEvidenceObjects(unverified);
         return res;
