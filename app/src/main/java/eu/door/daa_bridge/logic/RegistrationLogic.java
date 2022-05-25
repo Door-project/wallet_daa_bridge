@@ -7,6 +7,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Arrays;
 
+import eu.door.daa_bridge.http.APIClient;
+import eu.door.daa_bridge.http.APIInterface;
+import eu.door.daa_bridge.http.pojo.DAAUserHandle;
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
 import eu.door.daa_bridge.payload.EnableRequest;
 import eu.door.daa_bridge.payload.EnableResponse;
@@ -14,6 +17,9 @@ import eu.door.daa_bridge.payload.RegisterResponse;
 import eu.door.daa_bridge.payload.RegnObject;
 import eu.door.daa_bridge.util.KeystoreInfo;
 import eu.door.daa_bridge.util.SecurityUtil;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegistrationLogic {
 
@@ -22,6 +28,8 @@ public class RegistrationLogic {
     private static final String KEYSTORE_FILENAME = "daabridge.keystore";
 
     private final WalletDaaBridgeData data = WalletDaaBridgeData.getInstance();
+
+    private final APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
 
     private PrivateKey getPrivateKey(Context context){
         KeystoreInfo keystoreInfo = new KeystoreInfo(
@@ -98,6 +106,27 @@ public class RegistrationLogic {
         EnableResponse res = new EnableResponse();
         res.setP_EK(regnObject.getP_EK());
         res.setTpmNonce(regnObject.getTpmNonce());
+        res.setToken(data.getToken());
         return res;
+    }
+
+    public void daaUserHandle() {
+        DAAUserHandle userHandle = new DAAUserHandle("1", "user handle");
+
+        Call<String> call = apiInterface.daaUserHandle(userHandle);
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d("daaUserHandle","CODE: " + response.code()+"");
+                Log.d("daaUserHandle","BODY: " + response.body()+"");
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("daaUserHandle","Failure");
+                call.cancel();
+            }
+        });
     }
 }

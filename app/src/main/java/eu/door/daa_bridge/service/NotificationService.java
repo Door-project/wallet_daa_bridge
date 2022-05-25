@@ -10,10 +10,12 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import eu.door.daa_bridge.logic.RegistrationLogic;
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
 
 public class NotificationService extends FirebaseMessagingService {
 
+    RegistrationLogic logic = new RegistrationLogic();
 
     @Override
     public void onNewToken(String s) {
@@ -26,6 +28,10 @@ public class NotificationService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+
+        Log.d("RemoteMessage", remoteMessage.getData().toString());
+
+        logic.daaUserHandle();
     }
 
 

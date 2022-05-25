@@ -3,6 +3,7 @@ package eu.door.daa_bridge.payload;
 public class EnableResponse {
     private byte[] P_EK;
     private byte[] tpmNonce;
+    private String token;
 
     public EnableResponse() {
     }
@@ -21,5 +22,13 @@ public class EnableResponse {
 
     public void setTpmNonce(byte[] tpmNonce) {
         this.tpmNonce = tpmNonce;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
