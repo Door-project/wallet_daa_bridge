@@ -35,9 +35,11 @@ public class IssueLogic {
         return verified;
     }
 
-    //integration with TPM library
     public byte[] getTpmNonce() {
-        return new byte[0];
+        byte[] tmpNonce = data.getDaaInterface()
+                .startDAASession();
+
+        return tmpNonce;
     }
 
     //integration with TPM library
@@ -55,7 +57,6 @@ public class IssueLogic {
         return new IssueObject();
     }
 
-    //integration with TPM library
     public NonceResponse createNonceResponse(byte[] tpmNonce) {
         NonceResponse res = new NonceResponse();
         res.setTpmNonce(tpmNonce);

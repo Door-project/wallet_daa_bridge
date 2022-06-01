@@ -1,11 +1,16 @@
 package eu.door.daa_bridge.payload;
 
-//integration with tpm library
 public class RegnObject {
     private byte[] P_EK;
     private byte[] tpmNonce;
+    private String token;
 
     public RegnObject() {
+    }
+
+    public RegnObject(DaaInfo daaInfoObj) {
+        this.P_EK = daaInfoObj.getEndorsementKey();
+        this.tpmNonce = daaInfoObj.getNonce();
     }
 
     public byte[] getP_EK() {
@@ -22,5 +27,13 @@ public class RegnObject {
 
     public void setTpmNonce(byte[] tpmNonce) {
         this.tpmNonce = tpmNonce;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

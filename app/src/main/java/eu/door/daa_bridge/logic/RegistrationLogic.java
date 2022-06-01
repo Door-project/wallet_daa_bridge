@@ -3,6 +3,9 @@ package eu.door.daa_bridge.logic;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -11,6 +14,7 @@ import eu.door.daa_bridge.http.APIClient;
 import eu.door.daa_bridge.http.APIInterface;
 import eu.door.daa_bridge.http.pojo.DAAUserHandle;
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
+import eu.door.daa_bridge.payload.DaaInfo;
 import eu.door.daa_bridge.payload.EnableRequest;
 import eu.door.daa_bridge.payload.EnableResponse;
 import eu.door.daa_bridge.payload.RegisterResponse;
@@ -43,9 +47,7 @@ public class RegistrationLogic {
 
 
     public Boolean saveCertificate(String algorithm, String publicKey) {
-        //integration with TPM Library
-        //set wallet public key to TPM
-        //Boolean isOk = tmp.setWalletPublicKey(algorithm, publicKey);
+        data.getDaaInterface().registerWalletPK(publicKey.getBytes());
 
         PublicKey pk = SecurityUtil.readPublicKey(publicKey);
         if(pk == null){
@@ -90,9 +92,13 @@ public class RegistrationLogic {
         return verified;
     }
 
-    //integration with TPM library
     public RegnObject enable() {
-        return new RegnObject();
+        String daaInfo = data.getDaaInterface()
+                .DAAEnable();
+        Log.d("daaInfo", daaInfo);
+        Gson gson = new Gson();
+        DaaInfo daaInfoObj = gson.fromJson(daaInfo,DaaInfo.class);
+        return new RegnObject(daaInfoObj);
     }
 
     public RegisterResponse createRegisterResponse(byte[] signature) {
@@ -101,12 +107,11 @@ public class RegistrationLogic {
         return res;
     }
 
-    //integration with TPM library
     public EnableResponse createEnableResponse(RegnObject regnObject) {
         EnableResponse res = new EnableResponse();
-        res.setP_EK(regnObject.getP_EK());
+        regnObject.setToken(data.getToken());
+        res.setRegnObject(regnObject);
         res.setTpmNonce(regnObject.getTpmNonce());
-        res.setToken(data.getToken());
         return res;
     }
 

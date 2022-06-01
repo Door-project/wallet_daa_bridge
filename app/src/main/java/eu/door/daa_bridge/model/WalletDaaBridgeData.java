@@ -1,5 +1,7 @@
 package eu.door.daa_bridge.model;
 
+import com.daaBridge.daabridgecpp.DAAInterface;
+
 import java.security.PublicKey;
 
 public class WalletDaaBridgeData {
@@ -9,6 +11,8 @@ public class WalletDaaBridgeData {
     private PublicKey walletPublicKey;
     private String keyAlgorithm;
     private String token;
+    private DAAInterface daaInterface;
+
 
     private WalletDaaBridgeData() {
         pairingApplicationInfo = new ApplicationInfo("", -1);
@@ -60,5 +64,13 @@ public class WalletDaaBridgeData {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public DAAInterface getDaaInterface() {
+        return daaInterface;
+    }
+
+    public void setDaaInterface(DAAInterface daaInterface) {
+        this.daaInterface = daaInterface;
     }
 }
