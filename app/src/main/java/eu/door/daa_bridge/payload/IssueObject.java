@@ -1,20 +1,18 @@
 package eu.door.daa_bridge.payload;
 
 public class IssueObject {
-    private byte[] daaCRD;
+    private String daaSignature;
     private byte[] nonce;
-    private byte[] signature;
-    private String id;
 
     public IssueObject() {
     }
 
-    public byte[] getDaaCRD() {
-        return daaCRD;
+    public String getDaaSignature() {
+        return daaSignature;
     }
 
-    public void setDaaCRD(byte[] daaCRD) {
-        this.daaCRD = daaCRD;
+    public void setDaaSignature(String daaSignature) {
+        this.daaSignature = daaSignature;
     }
 
     public byte[] getNonce() {
@@ -23,21 +21,5 @@ public class IssueObject {
 
     public void setNonce(byte[] nonce) {
         this.nonce = nonce;
-    }
-
-    public byte[] getSignature() {
-        return signature;
-    }
-
-    public void setSignature(byte[] signature) {
-        this.signature = signature;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }

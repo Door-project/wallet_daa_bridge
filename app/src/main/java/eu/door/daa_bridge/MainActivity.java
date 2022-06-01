@@ -106,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
         // "Enable" the credential
         daaInterface.EnableDAACredential(fcre);
 
+        // ------------------------------------------------- //
+
 
         // Test signature
         byte[] n = daaInterface.startDAASession();
@@ -113,11 +115,13 @@ public class MainActivity extends AppCompatActivity {
         byte[] signed = daaInterface.walletDoMeASignPlz(n);
 
         byte[] derp = {0x00, 0x01, 0x03, 0x04};
-        daaInterface.DAASign(derp,signed);
+        String resp = daaInterface.DAASign(derp,signed);
 
-//        if(daaInterface.verifySignature(resp,derp) == 1){
-//            System.out.println("Signature Verified");
-//        } else System.out.println("Signature Verification Failed");
+        Log.d("DAASign", resp);
+
+        if(daaInterface.verifySignature(resp,derp) == 1){
+            System.out.println("Signature Verified");
+        } else System.out.println("Signature Verification Failed");
 
     }
 }

@@ -214,7 +214,7 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
             return;
         }
 
-        IssueObject issueObject = issueLogic.getIssueObject();
+        IssueObject issueObject = issueLogic.getIssueObject(req.getNonce(), req.getSigned());
 
         IssueResponse res = issueLogic.createIssueResponse(issueObject);
         resultOk(gson.toJson(res));

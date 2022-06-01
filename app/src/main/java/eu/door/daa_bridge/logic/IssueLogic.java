@@ -15,7 +15,6 @@ public class IssueLogic {
 
     private final WalletDaaBridgeData data = WalletDaaBridgeData.getInstance();
 
-    //integration with TPM library
     public Boolean verify(IssueRequest req) {
         PublicKey publicKey = data.getWalletPublicKey();
         Boolean verified = false;
@@ -42,18 +41,20 @@ public class IssueLogic {
         return tmpNonce;
     }
 
-    //integration with TPM library
     public IssueResponse createIssueResponse(IssueObject issueObject) {
         IssueResponse response = new IssueResponse();
-        response.setDaaCRD(issueObject.getDaaCRD());
         response.setNonce(issueObject.getNonce());
-        response.setSignature(issueObject.getSignature());
-        response.setId(issueObject.getId());
+        response.setDaaSignature(issueObject.getDaaSignature());
         return new IssueResponse();
     }
 
-    //integration with TPM library
-    public IssueObject getIssueObject() {
+    public IssueObject getIssueObject(byte[] nonce, byte[] signed) {
+
+        String resp = data.getDaaInterface().DAASign(nonce,signed);
+
+        IssueObject issueObject = new IssueObject();
+        issueObject.setDaaSignature(resp);
+        issueObject.setNonce(nonce);
         return new IssueObject();
     }
 
