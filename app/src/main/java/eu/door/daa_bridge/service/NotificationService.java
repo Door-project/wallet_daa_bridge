@@ -9,9 +9,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.gson.Gson;
 
 import eu.door.daa_bridge.logic.RegistrationLogic;
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
+import eu.door.daa_bridge.payload.DaaRegister;
 
 public class NotificationService extends FirebaseMessagingService {
 
@@ -31,7 +33,12 @@ public class NotificationService extends FirebaseMessagingService {
 
         Log.d("RemoteMessage", remoteMessage.getData().toString());
 
-        logic.daaUserHandle();
+        DaaRegister daaRegister = new Gson().fromJson(
+                remoteMessage.getData().toString(),
+                DaaRegister.class
+        );
+
+        logic.daaRegister(daaRegister);
     }
 
 

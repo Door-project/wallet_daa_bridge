@@ -13,8 +13,14 @@ import java.util.Arrays;
 import eu.door.daa_bridge.http.APIClient;
 import eu.door.daa_bridge.http.APIInterface;
 import eu.door.daa_bridge.http.pojo.DAAUserHandle;
+import eu.door.daa_bridge.http.pojo.EnabledFullCredentialReq;
+import eu.door.daa_bridge.http.pojo.GetFullCredentialReq;
+import eu.door.daa_bridge.http.pojo.GetFullCredentialRes;
+import eu.door.daa_bridge.http.pojo.GetIssuerChallengeReq;
+import eu.door.daa_bridge.http.pojo.GetIssuerChallengeRes;
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
 import eu.door.daa_bridge.payload.DaaInfo;
+import eu.door.daa_bridge.payload.DaaRegister;
 import eu.door.daa_bridge.payload.EnableRequest;
 import eu.door.daa_bridge.payload.EnableResponse;
 import eu.door.daa_bridge.payload.RegisterResponse;
@@ -115,23 +121,118 @@ public class RegistrationLogic {
         return res;
     }
 
-    public void daaUserHandle() {
-        DAAUserHandle userHandle = new DAAUserHandle("1", "user handle");
 
-        Call<String> call = apiInterface.daaUserHandle(userHandle);
+    public void daaRegister(DaaRegister daaRegister) {
+        //Call CreateEnableResponse: Creates the endorsementkey and returns registration object
+        //{AK, EK}
+        String issreg = createEnableResponseFromTpm(daaRegister);
+
+        // Send it to the DAA issuer
+        String challenge = getIssuerChallenge(issreg);
+
+        // Call back into the core and get a response to the challenge
+        String challengeResponse = handleIssuerChallenge(challenge);
+
+        // Send challenge response back to the issuer and obtain full credential
+        String fcre = getFullCredential(challengeResponse);
+
+        // "Enable" the credential
+        enableDAACredential(fcre);
+
+        // Inform DAA issuer that the credential is enabled
+        enabledFullCredential();
+    }
+
+    private void enableDAACredential(String fcre) {
+        data.getDaaInterface()
+                .EnableDAACredential(fcre);
+    }
+
+    private String createEnableResponseFromTpm(DaaRegister daaRegister) {
+        String issreg = data.getDaaInterface()
+                .CreateEnableResponse(daaRegister.getSignedTpmNonce());
+        return issreg;
+    }
+
+
+    private String handleIssuerChallenge(String challenge) {
+        return data.getDaaInterface().HandleIssuerChallenge(challenge);
+    }
+
+    private String getIssuerChallenge(String issreg) {
+        Call<GetIssuerChallengeRes> call = apiInterface.getIssuerChallenge(
+                new GetIssuerChallengeReq(issreg)
+        );
+
+        final String[] challenge = new String[1];
+
+        call.enqueue(new Callback<GetIssuerChallengeRes>() {
+            @Override
+            public void onResponse(Call<GetIssuerChallengeRes> call, Response<GetIssuerChallengeRes> response) {
+                Log.d("getIssuerChallenge","CODE: " + response.code()+"");
+                Log.d("getIssuerChallenge","BODY: " + response.body()+"");
+                challenge[0] = response.body().getChallenge();
+            }
+
+            @Override
+            public void onFailure(Call<GetIssuerChallengeRes> call, Throwable t) {
+                Log.d("getIssuerChallenge","Failure");
+                call.cancel();
+            }
+        });
+
+        return challenge[0];
+    }
+
+    private String getFullCredential(String challengeResponse) {
+        Call<GetFullCredentialRes> call = apiInterface.getFullCredential(
+                new GetFullCredentialReq(challengeResponse)
+        );
+
+        final String[] fcre = new String[1];
+
+        call.enqueue(new Callback<GetFullCredentialRes>() {
+            @Override
+            public void onResponse(Call<GetFullCredentialRes> call, Response<GetFullCredentialRes> response) {
+                Log.d("getFullCredential","CODE: " + response.code()+"");
+                Log.d("getFullCredential","BODY: " + response.body()+"");
+                fcre[0] = response.body().getFcre();
+            }
+
+            @Override
+            public void onFailure(Call<GetFullCredentialRes> call, Throwable t) {
+                Log.d("getFullCredential","Failure");
+                call.cancel();
+            }
+        });
+
+        return fcre[0];
+    }
+
+
+    private void enabledFullCredential() {
+        Call<String> call = apiInterface.enabledFullCredential(
+                new EnabledFullCredentialReq("OK")
+        );
 
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.d("daaUserHandle","CODE: " + response.code()+"");
-                Log.d("daaUserHandle","BODY: " + response.body()+"");
+                Log.d("enabledFullCredential","CODE: " + response.code()+"");
+                Log.d("enabledFullCredential","BODY: " + response.body()+"");
+
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.d("daaUserHandle","Failure");
+                Log.d("enabledFullCredential","Failure");
                 call.cancel();
             }
         });
     }
+
+
+
+
+
 }
