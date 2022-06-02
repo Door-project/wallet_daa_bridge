@@ -251,7 +251,6 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         isVerified = signLogic.verifyEvidenceObjects(req.getEvidenceObjects(), unverified);
 
         if(!isVerified) {
-
             RegnObject regnObject = signLogic.enable();
 
             SignErrorResponse res = signLogic.createSignVpErrorResponse(regnObject, unverified);
@@ -259,9 +258,9 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
             return;
         }
 
-        byte[] signedRpNonce = signLogic.sign(req.getRPNonce());
+        String daaSignature = signLogic.sign(req.getRPNonce(), req.getSigned());
 
-        SignResponse res = signLogic.createSignResponse(signedRpNonce);
+        SignResponse res = signLogic.createSignResponse(daaSignature, req.getNonce());
         resultOk(gson.toJson(res));
     }
 

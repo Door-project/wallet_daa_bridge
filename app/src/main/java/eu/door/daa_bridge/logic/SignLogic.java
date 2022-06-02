@@ -3,11 +3,14 @@ package eu.door.daa_bridge.logic;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.List;
 
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
+import eu.door.daa_bridge.payload.DaaInfo;
 import eu.door.daa_bridge.payload.Evidence;
 import eu.door.daa_bridge.payload.RegnObject;
 import eu.door.daa_bridge.payload.SignErrorResponse;
@@ -53,9 +56,10 @@ public class SignLogic {
         return verified;
     }
 
-    public SignResponse createSignResponse(byte[] signedRpNonce) {
+    public SignResponse createSignResponse(String daaSignature, byte[] nonce) {
         SignResponse res = new SignResponse();
-        res.setSignedRpNonce(signedRpNonce);
+        res.setDaaSignature(daaSignature);
+        res.setNonce(nonce);
         return res;
     }
 
@@ -64,26 +68,42 @@ public class SignLogic {
         return new byte[0];
     }
 
-    //integration with TPM library
     public Boolean verifyEvidenceObjects(List<Evidence> evidenceObjects, List<Evidence> unverified) {
+
+        int unverifiedObjects = 0;
+
         for(Evidence evidence : evidenceObjects){
             //verify evidence
+            if ( data.getDaaInterface()
+                    .verifySignature(
+                            evidence.getDaaSignature(),
+                            evidence.getNonce()
+                    ) != 1) {
+                unverified.add(evidence);
+                unverifiedObjects++;
+            }
         }
-        return true;
+
+        return unverifiedObjects == 0;
     }
 
-    //integration with TPM library
-    public byte[] sign(byte[] rpNonce) {
-        return new byte[0];
+    public String sign(byte[] rpNonce, byte[] signed) {
+        String resp = data.getDaaInterface().DAASign(rpNonce,signed);
+        return resp;
     }
 
-    //integration with TPM library
     public RegnObject enable() {
-        return new RegnObject();
+        String daaInfo = data.getDaaInterface()
+                .DAAEnable();
+        Log.d("daaInfo", daaInfo);
+        Gson gson = new Gson();
+        DaaInfo daaInfoObj = gson.fromJson(daaInfo,DaaInfo.class);
+        return new RegnObject(daaInfoObj);
     }
 
     public SignErrorResponse createSignVpErrorResponse(RegnObject regnObject, List<Evidence> unverified) {
         SignErrorResponse res = new SignErrorResponse();
+        regnObject.setToken(data.getToken());
         res.setRegnObject(regnObject);
         res.setEvidenceObjects(unverified);
         return res;
