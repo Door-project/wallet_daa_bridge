@@ -69,7 +69,7 @@ public class RegistrationLogic {
 
         byte[] signature = new byte[0];
         try {
-            signature = SecurityUtil.sign(data.getKeyAlgorithm(), pk, nonce);
+            signature = SecurityUtil.sign("EC", pk, nonce);
             Log.d("signature", Arrays.toString(signature));
         } catch (Exception e) {
             Log.e("signature", "Failed to sign message");
@@ -125,22 +125,12 @@ public class RegistrationLogic {
     public void daaRegister(DaaRegister daaRegister) {
         //Call CreateEnableResponse: Creates the endorsementkey and returns registration object
         //{AK, EK}
+        Log.d("daaRegister", "1) createEnableResponseFromTpm");
         String issreg = createEnableResponseFromTpm(daaRegister);
 
         // Send it to the DAA issuer
-        String challenge = getIssuerChallenge(issreg);
-
-        // Call back into the core and get a response to the challenge
-        String challengeResponse = handleIssuerChallenge(challenge);
-
-        // Send challenge response back to the issuer and obtain full credential
-        String fcre = getFullCredential(challengeResponse);
-
-        // "Enable" the credential
-        enableDAACredential(fcre);
-
-        // Inform DAA issuer that the credential is enabled
-        enabledFullCredential();
+        Log.d("daaRegister", "2) getIssuerChallenge");
+        getIssuerChallenge(issreg);
     }
 
     private void enableDAACredential(String fcre) {
@@ -159,19 +149,27 @@ public class RegistrationLogic {
         return data.getDaaInterface().HandleIssuerChallenge(challenge);
     }
 
-    private String getIssuerChallenge(String issreg) {
+    private void getIssuerChallenge(String issreg) {
         Call<GetIssuerChallengeRes> call = apiInterface.getIssuerChallenge(
                 new GetIssuerChallengeReq(issreg)
         );
 
-        final String[] challenge = new String[1];
 
         call.enqueue(new Callback<GetIssuerChallengeRes>() {
             @Override
             public void onResponse(Call<GetIssuerChallengeRes> call, Response<GetIssuerChallengeRes> response) {
                 Log.d("getIssuerChallenge","CODE: " + response.code()+"");
                 Log.d("getIssuerChallenge","BODY: " + response.body()+"");
-                challenge[0] = response.body().getChallenge();
+
+                String challenge = data.getDaaInterface().getIssuerChallenge(issreg);
+
+                // Call back into the core and get a response to the challenge
+                Log.d("daaRegister", "3) handleIssuerChallenge");
+                String challengeResponse = handleIssuerChallenge(challenge);
+
+                // Send challenge response back to the issuer and obtain full credential
+                Log.d("daaRegister", "4) getFullCredential");
+                getFullCredential(challengeResponse);
             }
 
             @Override
@@ -180,11 +178,9 @@ public class RegistrationLogic {
                 call.cancel();
             }
         });
-
-        return challenge[0];
     }
 
-    private String getFullCredential(String challengeResponse) {
+    private void getFullCredential(String challengeResponse) {
         Call<GetFullCredentialRes> call = apiInterface.getFullCredential(
                 new GetFullCredentialReq(challengeResponse)
         );
@@ -196,7 +192,16 @@ public class RegistrationLogic {
             public void onResponse(Call<GetFullCredentialRes> call, Response<GetFullCredentialRes> response) {
                 Log.d("getFullCredential","CODE: " + response.code()+"");
                 Log.d("getFullCredential","BODY: " + response.body()+"");
-                fcre[0] = response.body().getFcre();
+
+                String fcre = data.getDaaInterface().sendChallengeResponse(challengeResponse);
+
+                // "Enable" the credential
+                Log.d("daaRegister", "5) enableDAACredential");
+                enableDAACredential(fcre);
+
+                // Inform DAA issuer that the credential is enabled
+                Log.d("daaRegister", "6) enabledFullCredential");
+                enabledFullCredential();
             }
 
             @Override
@@ -205,8 +210,6 @@ public class RegistrationLogic {
                 call.cancel();
             }
         });
-
-        return fcre[0];
     }
 
 
@@ -220,7 +223,6 @@ public class RegistrationLogic {
             public void onResponse(Call<String> call, Response<String> response) {
                 Log.d("enabledFullCredential","CODE: " + response.code()+"");
                 Log.d("enabledFullCredential","BODY: " + response.body()+"");
-
             }
 
             @Override
@@ -230,9 +232,5 @@ public class RegistrationLogic {
             }
         });
     }
-
-
-
-
 
 }

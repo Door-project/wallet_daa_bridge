@@ -10,6 +10,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+
+import java.io.StringReader;
 
 import eu.door.daa_bridge.logic.RegistrationLogic;
 import eu.door.daa_bridge.model.WalletDaaBridgeData;
@@ -32,10 +35,11 @@ public class NotificationService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
 
         Log.d("RemoteMessage", remoteMessage.getData().toString());
+        String signedTpmNonce = remoteMessage.getData().get("signedTpmNonce");
 
-        DaaRegister daaRegister = new Gson().fromJson(
-                remoteMessage.getData().toString(),
-                DaaRegister.class
+        Gson gson = new Gson();
+        DaaRegister daaRegister = new DaaRegister(
+                gson.fromJson(signedTpmNonce, byte[].class)
         );
 
         logic.daaRegister(daaRegister);
