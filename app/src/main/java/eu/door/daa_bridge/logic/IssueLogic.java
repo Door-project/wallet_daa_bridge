@@ -45,7 +45,7 @@ public class IssueLogic {
         IssueResponse response = new IssueResponse();
         response.setNonce(issueObject.getNonce());
         response.setDaaSignature(issueObject.getDaaSignature());
-        return new IssueResponse();
+        return response;
     }
 
     public IssueObject getIssueObject(byte[] nonce, byte[] signed) {
@@ -55,7 +55,7 @@ public class IssueLogic {
         IssueObject issueObject = new IssueObject();
         issueObject.setDaaSignature(resp);
         issueObject.setNonce(nonce);
-        return new IssueObject();
+        return issueObject;
     }
 
     public NonceResponse createNonceResponse(byte[] tpmNonce) {

@@ -57,20 +57,17 @@ public class MainActivity extends AppCompatActivity {
 //
 //
 //        System.out.println("Trying to write Public Key IS/WK");
-//        String wk_priv = "-----BEGIN RSA PRIVATE KEY-----\n"
-//               + "MIIBOAIBAAJAabIOiUfWBi0Q5cc5gdqKhmDcFTIv8V08FT8rqz9kMAyTpqgDnn9T\n"
-//               + "9wutDBvQSla1WNs1w3oRmFiu1CBEn/62FwIDAQABAkBfFc459iQ2nihLbrTvevmP\n"
-//               + "9mdHskSrMKMywge5IWgySJWuYqwTMFrHjVgBTL8/6qsBrQLrUxYWqvuo8nFkktAB\n"
-//               + "AiEAruYduR4hc5yMMC7eUwNGfUBv0x5/nr7Wcbm9Hj9vRAECIQCatPQ6GQGQY+k8\n"
-//               + "jii5InFSPerkYB8mf+sdn5Nc4heaFwIgSTEfyzJiyWEAAcH7ZD4Ap7Xpli4zNhmi\n"
-//               + "4GDcVeYyCAECIAIVAVxuzbiVv6PS/fVP41qJ/slICeNIwW9KoH8Vg9/NAiBuzzLf\n"
-//               + "0XdUhUNkFV6n8RDcBTuLvC98XdynijrrTIokSA==\n"
-//               + "-----END RSA PRIVATE KEY-----\n";
+//        String wk_priv = "-----BEGIN EC PRIVATE KEY-----\n" +
+//                "MHcCAQEEIFwwF26cdqGNrk52CO3Znrv5QfkVH6qJmB/1TdknDm/RoAoGCCqGSM49\n" +
+//                "AwEHoUQDQgAE7lux68P/xJHfp+xc07KhOmOTB6kXx1sm0+NaSql0xvbX9D/gV982\n" +
+//                "JG1lwk3qMKlIwYrkBJ7X2+iVBaZPU59/qQ==\n" +
+//                "-----END EC PRIVATE KEY-----\n";
 //
-//        String wk = "-----BEGIN PUBLIC KEY-----\n"
-//                + "MFswDQYJKoZIhvcNAQEBBQADSgAwRwJAabIOiUfWBi0Q5cc5gdqKhmDcFTIv8V08\n"
-//                + "FT8rqz9kMAyTpqgDnn9T9wutDBvQSla1WNs1w3oRmFiu1CBEn/62FwIDAQAB\n"
-//                + "-----END PUBLIC KEY-----\n";
+//        String wk = "-----BEGIN PUBLIC KEY-----\n" +
+//                "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7lux68P/xJHfp+xc07KhOmOTB6kX\n" +
+//                "x1sm0+NaSql0xvbX9D/gV982JG1lwk3qMKlIwYrkBJ7X2+iVBaZPU59/qQ==\n" +
+//                "-----END PUBLIC KEY-----\n";
+//
 //
 //        String ik = "-----BEGIN PUBLIC KEY-----\n" +
 //                "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4CwPPzL9DS6n2zcDsV1hOadgL25Q\n" +
@@ -118,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //        // "Enable" the credential
 //        daaInterface.EnableDAACredential(fcre);
-//
+
 //        // ------------------------------------------------- //
 //
 //
