@@ -7,7 +7,7 @@ public final class DaaBridgeActions {
     public static final String ACTION_ENABLE = "eu.door.daa_bridge.ENABLE";
     public static final String ACTION_NONCE = "eu.door.daa_bridge.NONCE";
     public static final String ACTION_ISSUE = "eu.door.daa_bridge.ISSUE";
-    public static final String ACTION_SIGN = "eu.door.daa_bridge.ACTION_SIGN";
+    public static final String ACTION_SIGN = "eu.door.daa_bridge.SIGN";
 
     public static final String EXTRA_STRING_REQ = "eu.door.daa_bridge.REQUEST";
     public static final String EXTRA_STRING_RES = "eu.door.daa_bridge.RESPONSE";

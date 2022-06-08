@@ -7,7 +7,6 @@ public class SignRequest {
     private byte[] nonce;
     private byte[] signed;
     private byte[] RPNonce;
-    private String credentialId;
     private List<Evidence> evidenceObjects;
 
     public SignRequest() {
@@ -35,14 +34,6 @@ public class SignRequest {
 
     public void setRPNonce(byte[] RPNonce) {
         this.RPNonce = RPNonce;
-    }
-
-    public String getCredentialId() {
-        return credentialId;
-    }
-
-    public void setCredentialId(String credentialId) {
-        this.credentialId = credentialId;
     }
 
     public List<Evidence> getEvidenceObjects() {
