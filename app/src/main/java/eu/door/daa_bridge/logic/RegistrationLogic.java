@@ -5,14 +5,11 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.Arrays;
 
 import eu.door.daa_bridge.http.APIClient;
 import eu.door.daa_bridge.http.APIInterface;
-import eu.door.daa_bridge.http.pojo.DAAUserHandle;
 import eu.door.daa_bridge.http.pojo.EnabledFullCredentialReq;
 import eu.door.daa_bridge.http.pojo.GetFullCredentialReq;
 import eu.door.daa_bridge.http.pojo.GetFullCredentialRes;
@@ -70,7 +67,6 @@ public class RegistrationLogic {
         byte[] signature = new byte[0];
         try {
             signature = SecurityUtil.sign("EC", pk, nonce);
-            Log.d("signature", Arrays.toString(signature));
         } catch (Exception e) {
             Log.e("signature", "Failed to sign message");
             e.printStackTrace();
@@ -125,11 +121,9 @@ public class RegistrationLogic {
     public void daaRegister(DaaRegister daaRegister) {
         //Call CreateEnableResponse: Creates the endorsementkey and returns registration object
         //{AK, EK}
-        Log.d("daaRegister", "1) createEnableResponseFromTpm");
         String issreg = createEnableResponseFromTpm(daaRegister);
 
         // Send it to the DAA issuer
-        Log.d("daaRegister", "2) getIssuerChallenge");
         getIssuerChallenge(issreg);
     }
 
@@ -164,11 +158,9 @@ public class RegistrationLogic {
                 String challenge = data.getDaaInterface().getIssuerChallenge(issreg);
 
                 // Call back into the core and get a response to the challenge
-                Log.d("daaRegister", "3) handleIssuerChallenge");
                 String challengeResponse = handleIssuerChallenge(challenge);
 
                 // Send challenge response back to the issuer and obtain full credential
-                Log.d("daaRegister", "4) getFullCredential");
                 getFullCredential(challengeResponse);
             }
 
@@ -196,11 +188,9 @@ public class RegistrationLogic {
                 String fcre = data.getDaaInterface().sendChallengeResponse(challengeResponse);
 
                 // "Enable" the credential
-                Log.d("daaRegister", "5) enableDAACredential");
                 enableDAACredential(fcre);
 
                 // Inform DAA issuer that the credential is enabled
-                Log.d("daaRegister", "6) enabledFullCredential");
                 enabledFullCredential();
             }
 
@@ -227,7 +217,6 @@ public class RegistrationLogic {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.d("enabledFullCredential","Failure");
                 call.cancel();
             }
         });

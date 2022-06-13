@@ -114,7 +114,6 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
     private void register(String request) {
         Gson gson = new Gson();
         RegisterRequest req = gson.fromJson(request, RegisterRequest.class);
-        Log.d("Reqister req", request);
 
         Boolean isSaved = registrationLogic.saveCertificate(req.getAlgorithm(), req.getPublicKey());
         if(!isSaved){

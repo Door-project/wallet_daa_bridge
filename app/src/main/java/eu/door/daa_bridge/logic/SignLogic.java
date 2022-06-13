@@ -74,13 +74,19 @@ public class SignLogic {
 
         for(Evidence evidence : evidenceObjects){
             //verify evidence
+
+            Log.d("verifyEvidenceObjects", "Credential ID: " + evidence.getCredentialId());
             if ( data.getDaaInterface()
                     .verifySignature(
                             evidence.getDaaSignature(),
                             evidence.getNonce()
                     ) != 1) {
+                Log.d("verifyEvidenceObjects", "Verification failed");
                 unverified.add(evidence);
                 unverifiedObjects++;
+            }
+            else {
+                Log.d("verifyEvidenceObjects", "Successfully verified");
             }
         }
 
