@@ -56,6 +56,7 @@ public class RegistrationLogic {
         if(pk == null){
             return false;
         }
+        data.setWalletPublicKeyPem(publicKey);
         data.setWalletPublicKey(SecurityUtil.readPublicKey(publicKey));
         data.setKeyAlgorithm(algorithm);
         return true;
@@ -124,7 +125,7 @@ public class RegistrationLogic {
         String issreg = createEnableResponseFromTpm(daaRegister);
 
         // Send it to the DAA issuer
-        getIssuerChallenge(issreg);
+        getIssuerChallenge(issreg, data.getWalletPublicKeyPem());
     }
 
     private void enableDAACredential(String fcre) {
@@ -143,9 +144,9 @@ public class RegistrationLogic {
         return data.getDaaInterface().HandleIssuerChallenge(challenge);
     }
 
-    private void getIssuerChallenge(String issreg) {
+    private void getIssuerChallenge(String issreg, String walletPublicKey) {
         Call<GetIssuerChallengeRes> call = apiInterface.getIssuerChallenge(
-                new GetIssuerChallengeReq(issreg)
+                new GetIssuerChallengeReq(issreg, walletPublicKey)
         );
 
 
@@ -155,7 +156,7 @@ public class RegistrationLogic {
                 Log.d("getIssuerChallenge","CODE: " + response.code()+"");
                 Log.d("getIssuerChallenge","BODY: " + response.body()+"");
 
-                String challenge = data.getDaaInterface().getIssuerChallenge(issreg);
+                String challenge = response.body().getChallenge();
 
                 // Call back into the core and get a response to the challenge
                 String challengeResponse = handleIssuerChallenge(challenge);
@@ -177,15 +178,13 @@ public class RegistrationLogic {
                 new GetFullCredentialReq(challengeResponse)
         );
 
-        final String[] fcre = new String[1];
-
         call.enqueue(new Callback<GetFullCredentialRes>() {
             @Override
             public void onResponse(Call<GetFullCredentialRes> call, Response<GetFullCredentialRes> response) {
                 Log.d("getFullCredential","CODE: " + response.code()+"");
                 Log.d("getFullCredential","BODY: " + response.body()+"");
 
-                String fcre = data.getDaaInterface().sendChallengeResponse(challengeResponse);
+                String fcre = response.body().getFcre();
 
                 // "Enable" the credential
                 enableDAACredential(fcre);

@@ -9,6 +9,7 @@ public class WalletDaaBridgeData {
 
     private ApplicationInfo pairingApplicationInfo;
     private PublicKey walletPublicKey;
+    private String walletPublicKeyPem;
     private String keyAlgorithm;
     private String token;
     private DAAInterface daaInterface;
@@ -72,5 +73,17 @@ public class WalletDaaBridgeData {
 
     public void setDaaInterface(DAAInterface daaInterface) {
         this.daaInterface = daaInterface;
+    }
+
+    public static void setInstance(WalletDaaBridgeData instance) {
+        WalletDaaBridgeData.instance = instance;
+    }
+
+    public String getWalletPublicKeyPem() {
+        return walletPublicKeyPem;
+    }
+
+    public void setWalletPublicKeyPem(String walletPublicKeyPem) {
+        this.walletPublicKeyPem = walletPublicKeyPem;
     }
 }
