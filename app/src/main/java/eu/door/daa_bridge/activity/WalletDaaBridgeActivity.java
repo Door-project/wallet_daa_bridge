@@ -50,7 +50,7 @@ public class WalletDaaBridgeActivity extends AppCompatActivity {
         String action = intent.getAction();
 
         String req = intent.getStringExtra(DaaBridgeActions.EXTRA_STRING_REQ);
-        if(req == null) {
+        if(req == null && action != DaaBridgeActions.ACTION_NONCE) {
             badRequest();
             return;
         }
